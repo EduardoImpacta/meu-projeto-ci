@@ -1,18 +1,14 @@
-# meu-projeto-ci
-
-# Laboratório Prático — GitHub Actions com act
+# Projeto CI com act
 
 ## Objetivo
 
-O objetivo desta atividade foi criar e testar um pipeline de CI/CD localmente utilizando a ferramenta `act`, simulando o funcionamento do GitHub Actions antes de realizar o push para o repositório remoto.
+O objetivo deste projeto foi configurar e testar pipelines de CI/CD localmente utilizando a ferramenta `act`, simulando o funcionamento do GitHub Actions antes de realizar o envio para o repositório remoto.
 
 ---
 
 ## Estrutura do projeto
 
-Durante o desenvolvimento, foi criada a seguinte estrutura:
-
-```bash id="b1c9x2"
+```bash
 .github/
  └── workflows/
       ├── 01-hello-local.yml
@@ -24,34 +20,34 @@ README.md
 
 ---
 
-## Parte 2 — Workflow básico
+## Validação da Parte 2
 
-Foi criado um workflow simples para validar se o `act` estava funcionando corretamente.
+Foi criado um workflow básico para validar o funcionamento do `act`.
 
-O comando utilizado para listar os jobs foi:
+Comando utilizado:
 
-```bash id="a82ksl"
+```bash
 act -l
 ```
 
-Saída obtida:
+Saída:
 
-```bash id="k19xla"
+```bash
 Stage  Job ID         Job name        Workflow name
 0      teste-basico   teste-basico    01-hello-local
 ```
 
-O job aparece no **Stage 0**, pois não depende de nenhum outro.
+O job `teste-basico` está no Stage 0 pois não possui dependências.
 
-Para executar o workflow e visualizar apenas as mensagens:
+Execução do workflow:
 
-```bash id="p3ls92"
+```bash
 act -W .github/workflows/01-hello-local.yml | grep "|"
 ```
 
 Saída:
 
-```bash id="x92lsd"
+```bash
 | Iniciando testes locais
 | v20.11.0
 | Finalizado com sucesso!
@@ -59,19 +55,17 @@ Saída:
 
 ---
 
-## Parte 3 — Pipeline principal
+## Validação da Parte 3
 
-Foi criado um pipeline com quatro jobs e dependências entre eles.
+Para validar a estrutura do pipeline principal, foi utilizado:
 
-Para validar a estrutura, utilizei:
-
-```bash id="q82ksl"
+```bash
 act -l
 ```
 
-Resultado:
+Saída:
 
-```bash id="z82ksl"
+```bash
 Stage  Job ID              Job name              Workflow name
 0      setup-e-lint        setup-e-lint          pipeline-principal
 1      testes-unitarios    testes-unitarios      pipeline-principal
@@ -81,41 +75,37 @@ Stage  Job ID              Job name              Workflow name
 
 Interpretação:
 
-* O job `setup-e-lint` inicia o fluxo
-* Os jobs `testes-unitarios` e `scan-de-seguranca` rodam depois dele e ao mesmo tempo
-* O job `build-e-deploy` só executa depois que os dois anteriores terminam
+* Stage 0: `setup-e-lint`
+* Stage 1: `testes-unitarios` e `scan-de-seguranca`
+* Stage 2: `build-e-deploy`
+
+Isso confirma que o DAG foi montado corretamente conforme solicitado.
 
 ---
 
-## Parte 4 — Execuções e testes
+## Validação da Parte 4
 
 ### Execução com imagem customizada
 
-Para rodar o pipeline usando uma imagem diferente:
-
-```bash id="w82ksl"
+```bash
 act -W .github/workflows/02-pipeline-principal.yml -P ubuntu-latest=node:slim
 ```
 
 ---
 
-### Execução isolada de um job
+### Execução isolada do job de segurança
 
-Para rodar apenas o job de segurança:
-
-```bash id="e82ksl"
+```bash
 act -j scan-de-seguranca
 ```
 
 ---
 
-### Paralelismo
+### Comprovação de paralelismo
 
-Durante a execução completa, foi possível perceber que dois jobs rodaram ao mesmo tempo.
+Trecho da saída do terminal:
 
-Trecho da saída:
-
-```bash id="r82ksl"
+```bash
 [testes-unitarios] Starting container
 [scan-de-seguranca] Starting container
 
@@ -123,28 +113,24 @@ Trecho da saída:
 [scan-de-seguranca] | Procurando vulnerabilidades...
 ```
 
-Isso mostra que:
+Os dois jobs iniciam ao mesmo tempo e suas saídas aparecem intercaladas.
 
-* Os dois jobs iniciaram juntos
-* Cada um rodou em um container diferente
-* As mensagens aparecem intercaladas
-
-Ou seja, o `act` conseguiu simular corretamente o paralelismo do GitHub Actions.
+Isso demonstra que foram executados em paralelo, cada um em um container separado.
 
 ---
 
 ## comandos.txt
 
-Foi gerado com:
+O arquivo foi gerado com o comando:
 
-```bash id="t82ksl"
+```bash
 history 50 > comandos.txt
 ```
 
-Esse arquivo contém os principais comandos usados, incluindo:
+Ele contém os principais comandos utilizados durante o desenvolvimento, incluindo:
 
-* listagem de jobs (`act -l`)
-* validação de sintaxe (`act -n`)
+* `act -l`
+* `act -n`
 * execução com imagem customizada
 * execução de job isolado
 
@@ -152,4 +138,4 @@ Esse arquivo contém os principais comandos usados, incluindo:
 
 ## Conclusão
 
-Com essa atividade foi possível entender melhor como funciona a execução de pipelines no GitHub Actions e como utilizar o `act` para testar tudo localmente antes de enviar para o repositório.
+Foi possível validar todo o pipeline localmente utilizando o `act`, garantindo que o fluxo de CI/CD funcione corretamente antes de ser executado no GitHub Actions.
